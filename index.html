@@ -66,6 +66,12 @@
     display:none;align-items:center;justify-content:center;cursor:pointer;font-family:inherit;padding:0}
   #pauseBtn.show{display:flex}
   .err{color:#FFB4B4;font-weight:700;margin-top:8px;font-size:16px}
+  /* crèdit EMS: només text (sense enllaç, joc infantil). Centrat a la franja lila de l'escenari:
+     y 975-1000 de 1000 → centre al 98,8 % de l'alçada, com les estrelles. No rep tocs: passen al joc. */
+  #emsCredit{position:fixed;left:0;right:0;top:98.8%;transform:translateY(-50%);z-index:6;display:flex;justify-content:center;padding:0 12px;pointer-events:none;user-select:none}
+  #emsCredit span{display:block;font-family:"Baloo 2",system-ui,sans-serif;font-weight:700;font-size:11px;letter-spacing:.07em;line-height:1;
+    color:rgba(238,230,248,.78);white-space:nowrap;padding:3px 6px;text-shadow:0 1px 2px rgba(20,4,40,.9),0 0 8px rgba(20,4,40,.7)}
+  .overlay{padding-bottom:34px}
 </style>
 </head>
 <body>
@@ -110,6 +116,8 @@
     <div class="credit">«Crit o confit» · l'Ada de Som Mainada</div>
   </div>
 </div>
+
+<div id="emsCredit"><span>© EMS – WWW.EUROPEMULTIMEDIASERVICE.COM</span></div>
 
 <script>
 'use strict';
@@ -211,7 +219,9 @@ const catchY = () => L.stationY - L.adaH * 0.47;
 /* =====================================================================
    FONS (es pinta un cop a un canvas a part)
    ===================================================================== */
+function creditHalfUnits(){ const el = document.querySelector('#emsCredit span'); if(!el) return 0; const w = el.getBoundingClientRect().width; return w ? w/2/S + 8 : 0; }
 function buildBackground(){
+  L.creditHalf = creditHalfUnits();
   bgCanvas = document.createElement('canvas');
   bgCanvas.width = cv.width; bgCanvas.height = cv.height;
   const b = bgCanvas.getContext('2d');
@@ -305,7 +315,7 @@ function drawStage(b){
   // faldó lila amb estrelles
   b.fillStyle = COL.lila; b.fillRect(0, 975, LW, 25);
   b.fillStyle = COL.groc;
-  for(let x = 18; x < LW; x += 48){ star(b, x, 988, 6, 2.6); }
+  for(let x = 18; x < LW; x += 48){ if(Math.abs(x - LW/2) < (L.creditHalf||0)) continue; star(b, x, 988, 6, 2.6); }
 }
 function star(b, x, y, r1, r2){
   b.beginPath();
@@ -1273,10 +1283,13 @@ function drawLeaves(dt){
   }
 }
 function drawFrontPumpkins(){
-  const n = Math.max(4, Math.round(LW / 210));
+  const n = Math.max(4, Math.round(LW / 210)); const placed = [];
   for(let i=0;i<n;i++){
-    const x = (i + .5) * LW / n + (i%2 ? 18 : -18);
+    let x = (i + .5) * LW / n + (i%2 ? 18 : -18);
     if(Math.abs(x - LW/2) < L.slotW*.6) continue;
+    const ch = L.creditHalf || 0;   // no tapar el crèdit EMS: aparta la carbassa cap al costat
+    if(Math.abs(x - LW/2) < ch + 26){ x = x < LW/2 ? LW/2 - ch - 26 : LW/2 + ch + 26; if(x < 14 || x > LW - 14) continue; }
+    if(placed.some(px => Math.abs(px - x) < 50)) continue; placed.push(x);
     const fl = .75 + Math.sin(rtNow*9 + i*2)*.1 + Math.sin(rtNow*23 + i)*.05;
     const gg = ctx.createRadialGradient(x, 968, 2, x, 968, 46); gg.addColorStop(0, `rgba(255,190,60,${.45*fl})`); gg.addColorStop(1, 'rgba(255,190,60,0)');
     ctx.fillStyle = gg; ctx.fillRect(x-46, 920, 92, 92);
