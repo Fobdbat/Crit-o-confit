@@ -2,7 +2,7 @@
 
 Joc musical de navegador per a infants de 1r a 3r de primària, al ritme de la cançó **«Crit o confit»** de l'Ada de Som Mainada (Halloween i Castanyada).
 
-**Juga:** https://fobdbat.github.io/Crit-o-confit/
+**Juga:** https://crit-o-confit.pages.dev/
 
 ## Com es juga
 - L'Ada recull amb la cistella els confits, piruletes, castanyes i panellets que deixen caure els fantasmes tabalots.
